@@ -3,6 +3,7 @@ using J2N.Text;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Runtime.CompilerServices;
 
 namespace Lucene.Net.Util
 {
@@ -28,7 +29,7 @@ namespace Lucene.Net.Util
     /// <para/>
     /// @lucene.internal
     /// </summary>
-    public abstract class StringHelper
+    public static class StringHelper // LUCENENET specific - marked static and removed private constructor
     {
         /// <summary>
         /// Pass this as the seed to <see cref="Murmurhash3_x86_32(byte[], int, int, int)"/>. </summary>
@@ -41,6 +42,7 @@ namespace Lucene.Net.Util
         // denial of service attacks, and to catch any places that
         // somehow rely on hash function/order across JVM
         // instances:
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static int InitializeHashSeed()
         {
             // LUCENENET specific - reformatted with :
@@ -69,7 +71,7 @@ namespace Lucene.Net.Util
         /// <param name="left"> The first <see cref="BytesRef"/> to compare. </param>
         /// <param name="right"> The second <see cref="BytesRef"/> to compare. </param>
         /// <returns> The number of common elements. </returns>
-        public static int BytesDifference(BytesRef left, BytesRef right)
+        public static int BytesDifference(this BytesRef left, BytesRef right) // LUCENENET specific - converted to extension method
         {
             int len = left.Length < right.Length ? left.Length : right.Length;
             var bytesLeft = left.Bytes;
@@ -84,10 +86,6 @@ namespace Lucene.Net.Util
                 }
             }
             return len;
-        }
-
-        private StringHelper()
-        {
         }
 
         /// <summary> Returns a <see cref="T:IComparer{string}"/> over versioned strings such as X.YY.Z
@@ -132,6 +130,7 @@ namespace Lucene.Net.Util
                 return 0;
             });
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool Equals(string s1, string s2)
         {
             if (s1 == null)
@@ -154,7 +153,8 @@ namespace Lucene.Net.Util
         ///          The expected prefix </param>
         /// <returns> Returns <c>true</c> if the <paramref name="ref"/> starts with the given <paramref name="prefix"/>.
         ///         Otherwise <c>false</c>. </returns>
-        public static bool StartsWith(BytesRef @ref, BytesRef prefix) // LUCENENET TODO: API - convert to extension method
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool StartsWith(this BytesRef @ref, BytesRef prefix) // LUCENENET specific - converted to extension method
         {
             return SliceEquals(@ref, prefix, 0);
         }
@@ -169,12 +169,14 @@ namespace Lucene.Net.Util
         ///          The expected suffix </param>
         /// <returns> Returns <c>true</c> if the <paramref name="ref"/> ends with the given <paramref name="suffix"/>.
         ///         Otherwise <c>false</c>. </returns>
-        public static bool EndsWith(BytesRef @ref, BytesRef suffix) // LUCENENET TODO: API - convert to extension method
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool EndsWith(this BytesRef @ref, BytesRef suffix) // LUCENENET specific - converted to extension method
         {
             return SliceEquals(@ref, suffix, @ref.Length - suffix.Length);
         }
 
-        private static bool SliceEquals(BytesRef sliceToTest, BytesRef other, int pos)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static bool SliceEquals(this BytesRef sliceToTest, BytesRef other, int pos) // LUCENENET specific - converted to extension method
         {
             if (pos < 0 || sliceToTest.Length - pos < other.Length)
             {
@@ -259,6 +261,7 @@ namespace Lucene.Net.Util
         /// Returns the MurmurHash3_x86_32 hash.
         /// Original source/tests at <a href="https://github.com/yonik/java_util/">https://github.com/yonik/java_util/</a>. 
         /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int Murmurhash3_x86_32(BytesRef bytes, int seed)
         {
             return Murmurhash3_x86_32(bytes.Bytes, bytes.Offset, bytes.Length, seed);

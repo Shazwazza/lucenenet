@@ -1,4 +1,6 @@
 using J2N.Threading.Atomic;
+using System;
+using System.Runtime.CompilerServices;
 
 namespace Lucene.Net.Util
 {
@@ -36,14 +38,21 @@ namespace Lucene.Net.Util
         public abstract long AddAndGet(long delta);
 
         /// <summary>
+        /// Gets the counters current value.
+        /// </summary>
+        public abstract long Value { get; }
+
+        /// <summary>
         /// Returns the counters current value.
         /// </summary>
         /// <returns> The counters current value. </returns>
-        public abstract long Get(); // LUCENENET TODO: API: Change to Value property and add implicit operator to get
+        [Obsolete("Use Value instead. This method will be removed in 4.8.0 release candidate.")]
+        public virtual long Get() => Value;
 
         /// <summary>
         /// Returns a new counter. The returned counter is not thread-safe.
         /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Counter NewCounter()
         {
             return NewCounter(false);
@@ -56,36 +65,42 @@ namespace Lucene.Net.Util
         ///          <c>true</c> if the returned counter can be used by multiple
         ///          threads concurrently. </param>
         /// <returns> A new counter. </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Counter NewCounter(bool threadSafe)
         {
             return threadSafe ? (Counter)new AtomicCounter() : new SerialCounter();
         }
 
+        /// <summary>
+        /// Returns this counter's <see cref="Value"/> implicitly.
+        /// </summary>
+        /// <param name="counter"></param>
+        public static implicit operator long(Counter counter) => counter.Value; // LUCENENET specific
+
         private sealed class SerialCounter : Counter
         {
             private long count = 0;
 
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public override long AddAndGet(long delta)
             {
                 return count += delta;
             }
 
-            public override long Get()
-            {
-                return count;
-            }
+            public override long Value => count;
         }
 
         private sealed class AtomicCounter : Counter
         {
             private readonly AtomicInt64 count = new AtomicInt64();
 
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public override long AddAndGet(long delta)
             {
                 return count.AddAndGet(delta);
             }
 
-            public override long Get() => count;
+            public override long Value => count;
         }
     }
 }

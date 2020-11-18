@@ -45,9 +45,9 @@ namespace Lucene.Net.Search
 #endif
         public class TimeExceededException : Exception
         {
-            private long timeAllowed;
-            private long timeElapsed;
-            private int lastDocCollected;
+            private readonly long timeAllowed; // LUCENENET: marked readonly
+            private readonly long timeElapsed; // LUCENENET: marked readonly
+            private readonly int lastDocCollected; // LUCENENET: marked readonly
 
             internal TimeExceededException(long timeAllowed, long timeElapsed, int lastDocCollected)
                 : base("Elapsed time: " + timeElapsed + "Exceeded allowed search time: " + timeAllowed + " ms.")
@@ -147,12 +147,12 @@ namespace Lucene.Net.Search
         }
 
         /// <summary>
-        /// Syntactic sugar for <see cref="SetBaseline(long)"/> using <see cref="Counter.Get()"/>
+        /// Syntactic sugar for <see cref="SetBaseline(long)"/> using <see cref="Counter.Value"/>
         /// on the clock passed to the constructor.
         /// </summary>
         public virtual void SetBaseline()
         {
-            SetBaseline(clock.Get());
+            SetBaseline(clock);
         }
 
         /// <summary>
@@ -176,7 +176,7 @@ namespace Lucene.Net.Search
         ///           If the time allowed has exceeded. </exception>
         public virtual void Collect(int doc)
         {
-            long time = clock.Get();
+            long time = clock;
             if (timeout < time)
             {
                 if (greedy)
@@ -278,7 +278,7 @@ namespace Lucene.Net.Search
             //   afford losing a tick or two.
             //
             // See section 17 of the Java Language Specification for details.
-            private long time = 0;
+            private readonly long time = 0;
 
             private volatile bool stop = false;
             private long resolution;

@@ -30,6 +30,8 @@ param (
     [string] $LogLevel = 'Warning',
     [Parameter(Mandatory = $false)]
     [string] $BaseUrl = 'https://lucenenet.apache.org/docs/'
+    [Parameter(Mandatory = $false)]
+    [int] $StagingPort = 8080
 )
 
 # if the base URL is the lucene live site default value we also need to include the version
@@ -231,7 +233,7 @@ if ($?) {
     else {
         # build + serve (for testing)
         Write-Host "starting website..."
-        & $DocFxExe $DocFxJsonSite --log "$DocFxLog" --loglevel $LogLevel --serve --debug
+        & $DocFxExe $DocFxJsonSite --log "$DocFxLog" --loglevel $LogLevel --serve --port $StagingPort --debug
     }
 }
 
