@@ -34,8 +34,7 @@ on:
     #branches:
     #- master
     paths:
-    - 'websites/site/**/*'
-    - '.github/workflows/Lucene-Net-Website.yml'
+    - 'websites/site/**'
 
 env:
   # If a tag is specified, the tag will be in the format: Website_4_8_0_beta00013 which
@@ -47,8 +46,6 @@ env:
 jobs:
   build:
     runs-on: windows-latest
-    # Run only on the main fork (SHAZWAZZA - check whether this is right)
-    # if: ${{ github.repository == 'apache/lucenenet' }}
     steps:
 
       # Checkout the main repo with all history so we get all tags
