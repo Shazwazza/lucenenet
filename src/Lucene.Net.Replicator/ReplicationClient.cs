@@ -239,13 +239,19 @@ namespace Lucene.Net.Replicator
                 string version = handler.CurrentVersion;
                 session = replicator.CheckForUpdate(version);
 
-                WriteToInfoStream(string.Format("doUpdate(): handlerVersion={0} session={1}", version, session));
+                if (infoStream.IsEnabled(INFO_STREAM_COMPONENT))
+                {
+                    WriteToInfoStream(string.Format("doUpdate(): handlerVersion={0} session={1}", version, session));
+                }
 
                 if (session == null)
                     return;
 
                 IDictionary<string, IList<RevisionFile>> requiredFiles = RequiredFiles(session.SourceFiles);
-                WriteToInfoStream(string.Format("doUpdate(): handlerVersion={0} session={1}", version, session));
+                if (infoStream.IsEnabled(INFO_STREAM_COMPONENT))
+                {
+                    WriteToInfoStream(string.Format("doUpdate(): handlerVersion={0} session={1}", version, session));
+                }
 
                 foreach (KeyValuePair<string, IList<RevisionFile>> pair in requiredFiles)
                 {
@@ -356,7 +362,10 @@ namespace Lucene.Net.Replicator
         /// </remarks>
         protected virtual void HandleUpdateException(Exception exception)
         {
-            WriteToInfoStream(string.Format("an error occurred during revision update: {0}", exception));
+            if (infoStream.IsEnabled(INFO_STREAM_COMPONENT))
+            {
+                WriteToInfoStream(string.Format("an error occurred during revision update: {0}", exception));
+            }
         }
 
         /// <summary>
